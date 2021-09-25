@@ -9,7 +9,7 @@ from raifhack_ds.model import BenchmarkModel
 from raifhack_ds.settings import MODEL_PARAMS, LOGGING_CONFIG, NUM_FEATURES, CATEGORICAL_OHE_FEATURES,CATEGORICAL_STE_FEATURES,TARGET
 from raifhack_ds.utils import PriceTypeEnum
 from raifhack_ds.metrics import metrics_stat
-from raifhack_ds.features import prepare_categorical, parse_date
+from raifhack_ds.features import prepare_categorical, uncode_street
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         train_df = pd.read_csv(args['d'])
         logger.info(f'Input shape: {train_df.shape}')
         train_df = prepare_categorical(train_df)
-        train_df = parse_date(train_df)
+        #train_df = uncode_street(train_df)
 
         X_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][NUM_FEATURES+CATEGORICAL_OHE_FEATURES+CATEGORICAL_STE_FEATURES]
         y_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][TARGET]

@@ -13,12 +13,15 @@ def prepare_categorical(df: pd.DataFrame) -> pd.DataFrame:
     return df_new
 
 
-def parse_date(df, col='date'):
-    df[col] = pd.to_datetime(df[col])
-    df['month'] = df[col].dt.month
-    df['dayofmonth'] = df[col].dt.day
-    df['dayofweek'] = df[col].dt.dayofweek
-    df['dayofyear'] = df[col].dt.dayofyear
+def uncode_street(df):
+
+    def parse_street(value):
+        if value=='missing':
+            return -1
+        else:
+            return int(str(value)[1:])
+
+    df['street_num'] = df['street'].apply(lambda x: parse_street(x))
 
     return df
 
