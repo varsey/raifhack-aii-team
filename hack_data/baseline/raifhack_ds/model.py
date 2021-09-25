@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import logging
 
+from catboost import CatBoostRegressor
 from lightgbm import LGBMRegressor
 import xgboost as xgb
 
@@ -50,6 +51,7 @@ class BenchmarkModel():
 
         self.model = LGBMRegressor(**model_params)
         #self.model = xgb.XGBRegressor(**model_params)
+        #self.model = CatBoostRegressor(**model_params)
 
         self.pipeline = Pipeline(steps=[
             ('preprocessor', self.preprocessor),
@@ -79,7 +81,13 @@ class BenchmarkModel():
         :param y_manual: pd.Series - цены ручника
         """
         logger.info('Fit model ' + self.model.__module__)
-        self.pipeline.fit(X_offer, y_offer, model__feature_name=[f'{i}' for i in range(70)],model__categorical_feature=['67','68','69'])
+        cat_feat_names = []
+        for i in range(1, 5):
+            cat_feat_names.append(str(list(range(len(self.num_features + self.ohe_cat_features)))[-1] + i))
+        print(len(self.num_features+self.ohe_cat_features) + 3, cat_feat_names)
+        self.pipeline.fit(X_offer, y_offer,
+                          model__feature_name=[f'{i}' for i in range(len(self.num_features+self.ohe_cat_features) + 4 )],
+                          model__categorical_feature=cat_feat_names) #
         logger.info('Find corr coefficient')
         self._find_corr_coefficient(X_manual, y_manual)
         logger.info(f'Corr coef: {self.corr_coef:.2f}')
