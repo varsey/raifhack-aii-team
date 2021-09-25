@@ -1,12 +1,11 @@
 import argparse
 import logging.config
 import pandas as pd
-from raif_hack.features import prepare_categorical
+from raifhack_ds.features import prepare_categorical, parse_date
 from traceback import format_exc
 
-from raif_hack.model import BenchmarkModel
-from raif_hack.settings import LOGGING_CONFIG, NUM_FEATURES, CATEGORICAL_OHE_FEATURES, \
-    CATEGORICAL_STE_FEATURES
+from raifhack_ds.model import BenchmarkModel
+from raifhack_ds.settings import LOGGING_CONFIG, NUM_FEATURES, CATEGORICAL_OHE_FEATURES, CATEGORICAL_STE_FEATURES
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
@@ -41,6 +40,7 @@ if __name__ == "__main__":
         test_df = pd.read_csv(args['d'])
         logger.info(f'Input shape: {test_df.shape}')
         test_df = prepare_categorical(test_df)
+        test_df = parse_date(test_df)
 
         logger.info('Load model')
         model = BenchmarkModel.load(args['mp'])

@@ -5,12 +5,13 @@ import numpy as np
 import logging
 
 from lightgbm import LGBMRegressor
+import xgboost as xgb
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, OrdinalEncoder
 from sklearn.exceptions import NotFittedError
-from raif_hack.data_transformers import SmoothedTargetEncoding
+from .data_transformers import SmoothedTargetEncoding
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +45,11 @@ class BenchmarkModel():
         self.preprocessor = ColumnTransformer(transformers=[
             ('num', StandardScaler(), self.num_features),
             ('ohe', OneHotEncoder(), self.ohe_cat_features),
-            ('ste', OrdinalEncoder(handle_unknown='use_encoded_value',unknown_value=-1),
+            ('ste', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1),
              self.ste_cat_features)])
 
         self.model = LGBMRegressor(**model_params)
+        #self.model = xgb.XGBRegressor(**model_params)
 
         self.pipeline = Pipeline(steps=[
             ('preprocessor', self.preprocessor),
@@ -66,8 +68,7 @@ class BenchmarkModel():
         deviation = ((y_manual - predictions)/predictions).median()
         self.corr_coef = deviation
 
-    def fit(self, X_offer: pd.DataFrame, y_offer: pd.Series,
-            X_manual: pd.DataFrame, y_manual: pd.Series):
+    def fit(self, X_offer: pd.DataFrame, y_offer: pd.Series, X_manual: pd.DataFrame, y_manual: pd.Series):
         """Обучение модели.
         ML модель обучается на данных по предложениям на рынке (цены из объявления)
         Затем вычисляется среднее отклонение между руяными оценками и предиктами для корректировки стоимости
@@ -77,7 +78,7 @@ class BenchmarkModel():
         :param X_manual: pd.DataFrame с ручными оценками
         :param y_manual: pd.Series - цены ручника
         """
-        logger.info('Fit lightgbm')
+        logger.info('Fit model ' + self.model.__module__)
         self.pipeline.fit(X_offer, y_offer, model__feature_name=[f'{i}' for i in range(70)],model__categorical_feature=['67','68','69'])
         logger.info('Find corr coefficient')
         self._find_corr_coefficient(X_manual, y_manual)
