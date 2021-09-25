@@ -9,7 +9,7 @@ from raifhack_ds.model import BenchmarkModel
 from raifhack_ds.settings import MODEL_PARAMS, LOGGING_CONFIG, NUM_FEATURES, CATEGORICAL_OHE_FEATURES,CATEGORICAL_STE_FEATURES,TARGET
 from raifhack_ds.utils import PriceTypeEnum
 from raifhack_ds.metrics import metrics_stat
-from raifhack_ds.features import prepare_categorical, parse_date
+from raifhack_ds.features import prepare_categorical, uncode_street
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
@@ -44,9 +44,9 @@ if __name__ == "__main__":
         train_df = pd.read_csv(args['d'])
         logger.info(f'Input shape: {train_df.shape}')
         train_df = prepare_categorical(train_df)
-        train_df = parse_date(train_df)
+        train_df = uncode_street(train_df)
 
-        X_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][NUM_FEATURES+CATEGORICAL_OHE_FEATURES+CATEGORICAL_STE_FEATURES]
+        X_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
         y_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][TARGET]
 
         with open('X_offer.pkl', "wb") as data_X:
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         with open('y_offer.pkl', "wb") as data_y:
             pickle.dump(y_offer, data_y)
 
-        X_manual = train_df[train_df.price_type == PriceTypeEnum.MANUAL_PRICE][NUM_FEATURES+CATEGORICAL_OHE_FEATURES+CATEGORICAL_STE_FEATURES]
+        X_manual = train_df[train_df.price_type == PriceTypeEnum.MANUAL_PRICE][NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
         y_manual = train_df[train_df.price_type == PriceTypeEnum.MANUAL_PRICE][TARGET]
         logger.info(f'X_offer {X_offer.shape}  y_offer {y_offer.shape}\tX_manual {X_manual.shape} y_manual {y_manual.shape}')
         model = BenchmarkModel(numerical_features=NUM_FEATURES, ohe_categorical_features=CATEGORICAL_OHE_FEATURES,
