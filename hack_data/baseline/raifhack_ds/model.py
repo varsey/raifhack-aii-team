@@ -54,7 +54,7 @@ class BenchmarkModel():
         #self.model = CatBoostRegressor(**model_params)
 
         self.pipeline = Pipeline(steps=[
-            ('preprocessor', self.preprocessor),
+           ('preprocessor', self.preprocessor),
             ('model', self.model)])
 
         self._is_fitted = False
@@ -90,6 +90,7 @@ class BenchmarkModel():
         print(len(self.num_features) + n_cat_feat, cat_feat_names)
         print([f'{i}' for i in range(len(self.num_features+self.ohe_cat_features) + n_cat_feat )]) #+ len(X_offer.region.unique()) -1
 
+        #self.model.fit(X_offer, y_offer)
         self.pipeline.fit(X_offer, y_offer, #model__cat_features=['67', '68', '69', '70', '71']) #,
                           model__feature_name=[f'{i}' for i in range(len(self.num_features+self.ohe_cat_features) + n_cat_feat)], #+ 48
                           model__categorical_feature=cat_feat_names)

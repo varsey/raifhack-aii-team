@@ -43,11 +43,11 @@ if __name__ == "__main__":
         logger.info('Load train df')
         train_df = pd.read_csv(args['d'])
         logger.info(f'Input shape: {train_df.shape}')
-        train_df = prepare_categorical(train_df)
-        train_df = uncode_street(train_df)
+        #train_df = prepare_categorical(train_df)
+        #train_df = uncode_street(train_df)
 
-        X_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
-        y_offer = train_df[train_df.price_type == PriceTypeEnum.OFFER_PRICE][TARGET]
+        X_offer = train_df[NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
+        y_offer = train_df[TARGET]
 
         with open('X_offer.pkl', "wb") as data_X:
             pickle.dump(X_offer, data_X)
@@ -55,8 +55,8 @@ if __name__ == "__main__":
         with open('y_offer.pkl', "wb") as data_y:
             pickle.dump(y_offer, data_y)
 
-        X_manual = train_df[train_df.price_type == PriceTypeEnum.MANUAL_PRICE][NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
-        y_manual = train_df[train_df.price_type == PriceTypeEnum.MANUAL_PRICE][TARGET]
+        X_manual = train_df[NUM_FEATURES+CATEGORICAL_STE_FEATURES+CATEGORICAL_OHE_FEATURES]
+        y_manual = train_df[TARGET]
         logger.info(f'X_offer {X_offer.shape}  y_offer {y_offer.shape}\tX_manual {X_manual.shape} y_manual {y_manual.shape}')
         model = BenchmarkModel(numerical_features=NUM_FEATURES, ohe_categorical_features=CATEGORICAL_OHE_FEATURES,
                                ste_categorical_features=CATEGORICAL_STE_FEATURES, model_params=MODEL_PARAMS)
@@ -68,10 +68,6 @@ if __name__ == "__main__":
         predictions_offer = model.predict(X_offer)
         metrics = metrics_stat(y_offer.values, predictions_offer/(1+model.corr_coef)) # для обучающей выборки с ценами из объявлений смотрим качество без коэффициента
         logger.info(f'Metrics stat for training data with offers prices: {metrics}')
-
-        predictions_manual = model.predict(X_manual)
-        metrics = metrics_stat(y_manual.values, predictions_manual)
-        logger.info(f'Metrics stat for training data with manual prices: {metrics}')
         print(datetime.now() - start)
 
 

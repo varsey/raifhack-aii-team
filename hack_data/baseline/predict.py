@@ -39,15 +39,15 @@ if __name__ == "__main__":
         logger.info('Load test df')
         test_df = pd.read_csv(args['d'])
         logger.info(f'Input shape: {test_df.shape}')
-        test_df = prepare_categorical(test_df)
-        test_df = uncode_street(test_df)
+        #test_df = prepare_categorical(test_df)
+        #test_df = uncode_street(test_df)
 
         logger.info('Load model')
         model = BenchmarkModel.load(args['mp'])
         logger.info('Predict')
         test_df['per_square_meter_price'] = model.predict(test_df[NUM_FEATURES+CATEGORICAL_OHE_FEATURES+CATEGORICAL_STE_FEATURES])
         logger.info('Save results')
-        test_df[['id','per_square_meter_price']].to_csv(args['o'], index=False)
+        test_df[['per_square_meter_price']].to_csv(args['o'], index=False)
     except Exception as e:
         err = format_exc()
         logger.error(err)
