@@ -1,6 +1,6 @@
 TARGET = 'per_square_meter_price'
 # признаки (или набор признаков), для которых применяем smoothed target encoding
-CATEGORICAL_STE_FEATURES = ['region', 'city', 'floor', 'street', 'realty_type'] #['region', 'city', 'realty_type']
+CATEGORICAL_STE_FEATURES = ['region', 'city', 'floor', 'realty_type'] #['region', 'city', 'realty_type']
 
 # признаки, для которых применяем one hot encoding
 CATEGORICAL_OHE_FEATURES = []
@@ -41,7 +41,7 @@ NUM_FEATURES = ['lat', 'lng', 'osm_amenity_points_in_0.001',
                 'reform_house_population_1000', 'reform_house_population_500',
                 'reform_mean_floor_count_1000', 'reform_mean_floor_count_500',
                 'reform_mean_year_building_1000', 'reform_mean_year_building_500','total_square',
-                #'street_num'
+                'street_num'
                 ]
 #'''
 
@@ -63,6 +63,7 @@ MODEL_PARAMS = dict(
     importance_type="gain",
     n_jobs=6,
     random_state=563,
+    #cat_features = CATEGORICAL_STE_FEATURES,
     verbose=0
         )
 
